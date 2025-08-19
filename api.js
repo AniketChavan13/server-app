@@ -2,7 +2,7 @@ var mongoClient = require("mongodb").MongoClient;
 var express = require("express");
 var cors = require("cors");
 
-var conStr = "mongodb://127.0.0.1:27017";
+var conStr = " mongodb+srv://aniket:<98329832>@cluster0.qfnxera.mongodb.net/";
 
 var app = express();
 
@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-//Routes
+
 
 app.get("/admin", (req, res) => {
 
@@ -55,17 +55,35 @@ app.get("/categories", (req, res) => {
 });
 
 app.get("/users", (req, res) => {
-
     mongoClient.connect(conStr).then(clientObj => {
-
-        var database = clientObj.db("videolibrary");
-        database.collection("users").find({}).toArray().then(documents => {
-            res.send(documents);
-            res.end();
-        });
+        const database = clientObj.db("videolibrary");
+        database.collection("users")
+            .find({})
+            .toArray()
+            .then(documents => {
+                res.send(documents);
+                res.end();
+            });
     });
-
 });
+
+app.get("/users/:id", (req, res) => {
+    mongoClient.connect(conStr).then(clientObj => {
+        const database = clientObj.db("videolibrary");
+        database.collection("users")
+            .findOne({ UserId: req.params.id })
+            .then(document => {
+                if (document) {
+                    res.send(document);
+                } else {
+                    res.status(404).send({ error: "User not found" });
+                }
+                res.end();
+            });
+    });
+});
+
+
 
 app.get("/video/:id", (req, res) => {
 
